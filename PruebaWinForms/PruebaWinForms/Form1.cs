@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+// Para realizar consultas directas a la base de datos
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,20 +17,82 @@ namespace PruebaWinForms
     {
         public string ARCHIVO = "";
 
+        // Conexión OLEDB
+        // Provider=SQLOLEDB.1;User ID=<username>;Password=<strong password>;Initial Catalog=pubs;Data Source=(local)
+
+        // Conexión SqlClient
+        // User ID=<username>;Password=<strong password>;Initial Catalog=pubs;Data Source=(local)
+
+        public string CadenaConexion = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MVCDemoDB;Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
 
+        private void Conectar()
+        {
+            SqlConnection conexion = new SqlConnection();
+
+            conexion.ConnectionString = CadenaConexion;
+
+            conexion.Open();
+
+            MessageBox.Show("Me acabo de conectar...");
+
+            string consulta = "select * from employee";
+            consulta = "insert into Employee (id, EmployeeId, FirstName, LastName, EmailAdress) values (1, 1, \"1\",\"1\",\"1\")";
+            consulta = "insert into Employee values (1, 1, \"1\",\"1\",\"1\")";
+            consulta = "create table tabla1 (id integer)";
+            /*
+            consulta = "insert into tabla1 (id) values (@ident)";
+            SqlCommand comando = new SqlCommand(consulta, conexion);
+            comando.Parameters.Add("@ident",SqlDbType.Int).Value=1000;
+
+            try
+            {
+                comando.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            */
+            consulta = "select * from tabla1";
+            SqlCommand comando = new SqlCommand(consulta, conexion);
+            SqlDataReader lector;
+
+            try
+            {
+                lector = comando.ExecuteReader();
+                while(lector.Read())
+                {
+                    MessageBox.Show(lector.GetValue(0).ToString());
+                }
+                lector.Close();
+                comando.Dispose();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            conexion.Close();
+
+            MessageBox.Show("Acabo de desconectar.");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             //Application.Exit();
             cargarArchivo();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -112,6 +176,16 @@ namespace PruebaWinForms
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Conectar();
         }
     }
 }
